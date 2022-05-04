@@ -9,15 +9,71 @@ class Cart extends StatefulWidget {
 }
 class _CartState extends State<Cart> {
 
-  Future addToPayment() async {
-    AsyncSnapshot <QuerySnapshot> snapshot;
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    var currentUser = _auth.currentUser;
-    var total = FirebaseFirestore.instance.collection("users-cart-items").doc(FirebaseAuth.instance.currentUser!.email).collection("items");
-    CollectionReference _collectionRef =
-    FirebaseFirestore.instance.collection("users-orders-items");
-    print(total);
+  final List _order = [];
+  int totalBill = 0;
+  final _firestoreInstance = FirebaseFirestore.instance;
+  fetchProducts() async {
+
+    QuerySnapshot qn =
+    await _firestoreInstance.collection("users-cart-items").doc(FirebaseAuth.instance.currentUser!.email).collection("items").get();
+    setState(() {
+      for (int i = 0; i < qn.docs.length; i++) {
+        _order.add(
+            {
+              "name": qn.docs[i]["name"],
+              "price" : qn.docs[i]["price"]
+            }
+
+        );
+
+      }
+    });
+
+    return qn.docs;
   }
+
+  fetchProducts2() async {
+
+    QuerySnapshot qn =
+    await _firestoreInstance.collection("users-cart-items").doc(FirebaseAuth.instance.currentUser!.email).collection("items").get();
+    setState(() {
+      for (int i = 0; i < qn.docs.length; i++) {
+        _order.removeRange(0, 2);
+
+      }
+    });
+
+    return qn.docs;
+  }
+
+  Future addToPayment() async {
+    fetchProducts();
+    CollectionReference _collectionRef = FirebaseFirestore.instance.collection("users-cart-items");
+    var ListItem = _collectionRef.doc(FirebaseAuth.instance.currentUser!.email).collection("items").get();
+    for (int i = 0; i < _order.length; i++) {
+      print(_order[i]["name"]);
+      var myInt = int.parse(_order[i]["price"]);
+      assert(myInt is int);
+      totalBill = totalBill + myInt;
+
+    }
+    print(totalBill);
+    print(_order);
+    //fetchProducts2();
+    // final FirebaseAuth _auth = FirebaseAuth.instance;
+    // var currentUser = _auth.currentUser;
+    // CollectionReference _collectionRef1 =
+    // FirebaseFirestore.instance.collection("users-cart-items");
+    // return _collectionRef1
+    //     .doc(currentUser!.email)
+    //     .collection("items")
+    //     .doc()
+    //     .update({
+    //
+    //   "status": "shipping"
+    // }).then((value) => print("Added to cart1"));
+  }
+
 
 
   @override

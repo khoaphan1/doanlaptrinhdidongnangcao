@@ -27,6 +27,7 @@ class _ProductDetailsState extends State<ProductDetails> {
       "name": widget._product["product-name"],
       "price": widget._product["product-price"],
       "images": widget._product["product-img"],
+      "status": "in cart"
     }).then((value) => print("Added to cart"));
   }
 
